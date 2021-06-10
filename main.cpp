@@ -4,59 +4,61 @@
 
 const real NANO_M = 1e-9;
 
-int main() {
-    std::cout.precision(15);
-    /*
-     * Взаимодействие кубов из частиц
-     */
-    /*
-    for (int i = 1; i < 200; ++i) {
-        auto cube1 = create_cube(3, 5 * NANO_M);
-        auto cube2 = create_cube(3, 5 * NANO_M);
-        move(cube2, {0.05 * i * NANO_M, 0, 0});
+/*
+ * Взаимодействие кубов из частиц
+ */
+void interactionOfCubes() {
+    for (int i = 1; i < 100; ++i) {
+        auto cube1 = createCube(3, 6 * NANO_M);
+        auto cube2 = createCube(3, 6 * NANO_M);
+        move(cube2, {(0.01 * i + 3) * NANO_M, 0, 0});
+        SystemOscillators a = createCube(3, 1.5 * NANO_M);
         SystemOscillators systemCubes = join(cube1, cube2);
-        std::cout << 0.05 * i * NANO_M << "\t" << systemCubes.EnergyVDW() << std::endl;
+        std::cout << (0.01 * i) << "\t" << (systemCubes.totalEnergy() - 2 * a.totalEnergy()) * 1e17 << std::endl;
     }
-     */
+}
 
-    /*
-     * Взаимодействие вертикальных цепочек
-     */
+/*
+ * Взаимодействие вертикальных цепочек
+ */
+void interactionOfVertical() {
     std::vector<Oscillator> vertical1;
-    for (int i = 0; i < 10; ++i) {
-        vertical1.emplace_back(Oscillator{0, 0, i*NANO_M});
-    }
     std::vector<Oscillator> vertical2;
     for (int i = 0; i < 10; ++i) {
-        vertical2.emplace_back(Oscillator{0, 0, i*NANO_M});
+        vertical1.emplace_back(Oscillator{0, 0, i * 10 * NANO_M});
+        vertical2.emplace_back(Oscillator{0, 0, (i * 10 + 5) * NANO_M});
     }
-
-        move(vertical2, {0.01 * 2 * NANO_M, 0, 0});
+    SystemOscillators a = vertical2;
+    for (int i = 1; i < 100; ++i) {
+        move(vertical2, {(0.01 * i) * NANO_M, 0, 0});
         SystemOscillators systemVerticals = join(vertical1, vertical2);
-        std::cout << 0.05 * 2 * NANO_M << "\t" << systemVerticals.TotalEnergy() << std::endl;
+        std::cout << 0.01 * i << "\t" << (systemVerticals.totalEnergy() - 2 * a.totalEnergy()) * 1e17 << std::endl;
+    }
+}
 
+/*
+ * Взаимодействие горизонтальных цепочек
+ */
+void interactionOfHorizontal() {
+    std::vector<Oscillator> horizontal1;
+    std::vector<Oscillator> horizontal2;
+    for (int i = 0; i < 10; ++i) {
+        horizontal1.emplace_back(Oscillator{NANO_M * i, 0, 0});
+        horizontal2.emplace_back(Oscillator{NANO_M * i, 0, 0});
+    }
+    SystemOscillators a = horizontal2;
+    move(horizontal2, {9 * NANO_M, 0, 0});
+    for (int i = 1; i < 400; ++i) {
+        move(horizontal2, {0.01 * i * NANO_M, 0, 0});
+        SystemOscillators systemVerticals = join(horizontal1, horizontal2);
+        std::cout << 0.01 * i << "\t" << (systemVerticals.totalEnergy() - 2 * a.totalEnergy()) * 1e17 << std::endl;
+    }
+}
 
+int main() {
+    std::cout.precision(15);
 
-    /* for (int i = 1; i < 1000; ++i) {
-          system_oscillators a;
-          a.addAtom({0, 0, 0});
-          a.addAtom({(0.01*NANO_M+0.01 * i*NANO_M), 0, 0});
-          std::cout << (0.01 * i*NANO_M+ 0.01 * NANO_M) << "\t" << a.EnergyVDW() << std::endl;
-      }*/
-
-
-
-    /*float T = a.TotalEnergy();
-    float W = a.EnergyVDW();
-    std::cout << W << " ";
-    for (int i = 0; i < 9; ++i) {
-        std::cout << T[i] << " ";
-        }
-    for (int i = 0; i < 9; ++i) {
-        std::cout << std::endl;
-        for (int j = 0; j < 9; ++j) {
-            std::cout << R(i,j) << " ";
-        }
-    }*/
-
+    // interactionOfHorizontal();
+    // interactionOfVertical();
+    interactionOfCubes();
 }
